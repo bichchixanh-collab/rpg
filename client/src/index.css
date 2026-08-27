@@ -1,0 +1,375 @@
+/* Design reminder: Mộc Bản Giang Hồ pairs a full-bleed pixel map with lacquer-red seals, aged bronze rules, and disciplined corner HUD. */
+
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600;700&family=Noto+Serif+SC:wght@600;700;800&display=swap");
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --ink: #14241e;
+  --lacquer: #a53b2a;
+  --lacquer-deep: #632218;
+  --bronze: #b79a5a;
+  --paper: #efe0b9;
+  --water: #4f949a;
+}
+
+* { box-sizing: border-box; }
+
+html, body, #root {
+  width: 100%;
+  min-width: 0;
+  min-height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background: var(--ink);
+}
+
+body {
+  color: var(--paper);
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  overscroll-behavior: none;
+}
+
+button, canvas { -webkit-tap-highlight-color: transparent; }
+
+.game-shell {
+  position: relative;
+  width: 100vw;
+  height: 100dvh;
+  min-height: 100svh;
+  overflow: hidden;
+  isolation: isolate;
+  background: #14241e;
+}
+
+.game-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  outline: none;
+  image-rendering: pixelated;
+  touch-action: none;
+}
+
+.mist-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.22;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+.hud-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.top-hud {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: clamp(0.8rem, 2vw, 1.8rem);
+}
+
+.wordmark-panel,
+.status-panel,
+.world-notice,
+.control-hint,
+.reset-button {
+  border: 1px solid rgba(183, 154, 90, 0.78);
+  box-shadow: 0 6px 0 rgba(33, 17, 12, 0.28), inset 0 0 0 2px rgba(26, 12, 9, 0.44);
+  background:
+    linear-gradient(90deg, rgba(99, 34, 24, 0.95), rgba(74, 36, 25, 0.91)),
+    repeating-linear-gradient(0deg, rgba(255,255,255,0.025) 0 1px, transparent 1px 4px);
+}
+
+.wordmark-panel {
+  display: flex;
+  align-items: center;
+  min-width: min(312px, 66vw);
+  gap: 0.7rem;
+  padding: 0.42rem 0.95rem 0.42rem 0.48rem;
+  clip-path: polygon(0 0, 97% 0, 100% 22%, 100% 100%, 3% 100%, 0 78%);
+}
+
+.seal-logo-frame {
+  display: grid;
+  width: 56px;
+  height: 56px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 2px solid #f1d99a;
+  outline: 2px solid #5f1f16;
+  background: #a53b2a;
+  box-shadow: inset 0 0 0 5px #7c271b, 2px 2px 0 #2c120d;
+}
+
+.seal-logo {
+  width: 47px;
+  height: 47px;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+  filter: saturate(1.32) contrast(1.08);
+  image-rendering: pixelated;
+}
+
+.eyebrow {
+  margin: 0 0 0.12rem;
+  color: #d8bc78;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+h1 {
+  margin: 0;
+  color: #fff1cf;
+  font-family: "Noto Serif SC", Georgia, serif;
+  font-size: clamp(1.02rem, 2.3vw, 1.5rem);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: 0.025em;
+}
+
+h1 span { color: #d8bc78; font-weight: 600; }
+
+.status-panel {
+  width: min(302px, 45vw);
+  padding: 0.68rem 0.82rem 0.62rem;
+  clip-path: polygon(0 0, 100% 0, 100% 82%, 96% 100%, 0 100%);
+}
+
+.vitals-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  color: #f6e4bc;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+}
+
+.vitals-row strong { color: #f6e4bc; font-size: 0.58rem; }
+
+.vital-track {
+  height: 6px;
+  margin: 0.38rem 0 0.5rem;
+  overflow: hidden;
+  border: 1px solid rgba(18, 10, 8, 0.72);
+  background: #371814;
+}
+
+.vital-track span {
+  display: block;
+  width: 82%;
+  height: 100%;
+  background: linear-gradient(90deg, #c04b34 0 84%, #e7bd62 84% 100%);
+}
+
+.status-panel p {
+  min-height: 2.35em;
+  margin: 0;
+  color: #eddcad;
+  font-family: "Noto Serif SC", Georgia, serif;
+  font-size: clamp(0.62rem, 1.35vw, 0.77rem);
+  line-height: 1.28;
+}
+
+.world-notice {
+  position: absolute;
+  top: clamp(5.9rem, 11vw, 7.4rem);
+  left: clamp(0.8rem, 2vw, 1.8rem);
+  display: flex;
+  align-items: center;
+  gap: 0.43rem;
+  padding: 0.42rem 0.62rem;
+  color: #eed8a3;
+  font-size: 0.6rem;
+  letter-spacing: 0.05em;
+  clip-path: polygon(0 0, 100% 0, 94% 100%, 0 100%);
+}
+
+.motion-dot {
+  width: 7px;
+  height: 7px;
+  border: 1px solid #d7b86d;
+  background: #3d6e67;
+  transform: rotate(45deg);
+}
+
+.motion-dot.active { background: #d34f37; box-shadow: 0 0 0 3px rgba(211, 79, 55, 0.2); }
+
+.bottom-hud {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: clamp(0.85rem, 2.4vw, 1.75rem);
+}
+
+.touchpad {
+  position: relative;
+  width: clamp(108px, 14vw, 154px);
+  aspect-ratio: 1;
+  pointer-events: auto;
+  touch-action: none;
+  filter: drop-shadow(0 7px 0 rgba(24, 14, 10, 0.27));
+}
+
+.touchpad::before,
+.touchpad::after {
+  position: absolute;
+  inset: 12%;
+  content: "";
+  border: 1px solid rgba(231, 203, 136, 0.68);
+  background: rgba(78, 30, 21, 0.77);
+  transform: rotate(45deg);
+}
+
+.touchpad::after { inset: 24%; border-color: rgba(211, 171, 90, 0.4); background: transparent; }
+
+.touchpad-ring {
+  position: absolute;
+  inset: 2%;
+  border: 2px solid rgba(221, 182, 101, 0.9);
+  outline: 2px solid rgba(82, 31, 21, 0.72);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(138, 48, 33, 0.55), rgba(47, 24, 18, 0.71) 68%, rgba(22, 15, 12, 0.38));
+}
+
+.touchpad-core {
+  position: absolute;
+  z-index: 1;
+  top: 37%;
+  left: 37%;
+  width: 26%;
+  height: 26%;
+  border: 2px solid #f0d99a;
+  border-radius: 50%;
+  background: #a43a2a;
+  box-shadow: inset 0 0 0 3px #622117, 0 2px 0 #31120d;
+  transition: transform 70ms linear;
+}
+
+.touchpad-label {
+  position: absolute;
+  z-index: 2;
+  top: 44.5%;
+  right: 0;
+  left: 0;
+  color: #f4dca5;
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-align: center;
+  text-shadow: 0 1px 0 #3a160f;
+}
+
+.control-hint {
+  align-self: flex-end;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0 0 0.1rem;
+  padding: 0.45rem 0.66rem;
+  color: #f1dfb6;
+  font-size: 0.62rem;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+
+kbd {
+  border: 1px solid rgba(235, 210, 148, 0.52);
+  background: rgba(20, 15, 11, 0.4);
+  padding: 0.11rem 0.2rem;
+  color: #e5c270;
+  font-family: inherit;
+  font-size: 0.56rem;
+}
+
+.action-cluster {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.58rem;
+  pointer-events: auto;
+}
+
+.reset-button {
+  padding: 0.5rem 0.64rem;
+  color: #efdcac;
+  font-family: "Noto Serif SC", Georgia, serif;
+  font-size: 0.72rem;
+  transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1), background 160ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.action-button {
+  position: relative;
+  width: clamp(78px, 9vw, 98px);
+  aspect-ratio: 1;
+  overflow: hidden;
+  border: 2px solid #e4c578;
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 28%, #d75e42 0 12%, #a33628 13% 54%, #612116 55% 100%);
+  box-shadow: inset 0 0 0 6px rgba(58, 17, 12, 0.8), 0 6px 0 rgba(33, 12, 8, 0.36);
+  color: #ffedc2;
+  font-family: "Noto Serif SC", Georgia, serif;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  transition: transform 160ms cubic-bezier(0.23, 1, 0.32, 1), filter 160ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.action-button::before {
+  position: absolute;
+  inset: 14%;
+  content: "";
+  border: 1px solid rgba(255, 232, 179, 0.56);
+  border-radius: 50%;
+}
+
+.action-button span { position: relative; z-index: 1; font-size: 1rem; }
+.action-button:active, .reset-button:active { transform: scale(0.97); }
+.action-button:hover { filter: saturate(1.12) brightness(1.08); }
+
+@media (max-width: 720px) {
+  .top-hud { padding: 0.7rem; gap: 0.45rem; }
+  .wordmark-panel { min-width: 0; padding-right: 0.55rem; gap: 0.45rem; }
+  .seal-logo-frame { width: 46px; height: 46px; }
+  .seal-logo { width: 39px; height: 39px; }
+  .status-panel { width: 42vw; padding: 0.5rem 0.56rem; }
+  .vitals-row { font-size: 0.52rem; }
+  .status-panel p { min-height: 2.5em; font-size: 0.59rem; }
+  .world-notice { top: 5rem; left: 0.7rem; font-size: 0.54rem; }
+  .bottom-hud { padding: 0.75rem; }
+  .control-hint { display: none; }
+  .reset-button { display: none; }
+  .action-cluster { gap: 0; }
+}
+
+@media (max-height: 520px) {
+  .world-notice { display: none; }
+  .status-panel p { display: none; }
+  .status-panel { padding-bottom: 0.48rem; }
+  .touchpad { width: 96px; }
+  .action-button { width: 70px; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .motion-dot.active { animation: seal-pulse 1.2s cubic-bezier(0.23, 1, 0.32, 1) infinite; }
+}
+
+@keyframes seal-pulse {
+  50% { transform: rotate(45deg) scale(1.25); }
+}

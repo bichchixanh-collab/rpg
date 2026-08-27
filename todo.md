@@ -1,0 +1,6 @@
+- [x] Đóng gói mã nguồn, tài liệu và cấu hình dự án thành tệp ZIP.
+- [x] Kiểm tra archive và gửi tệp ZIP để người dùng tải xuống.
+- [x] Thêm va chạm player–animal, hitbox kiếm và trạng thái sát thương.
+- [ ] Thêm phản ứng của sói/thỏ, kiểm thử gameplay và tạo ZIP cập nhật.
+- [ ] Chuyển toàn bộ asset runtime sang `client/public/assets` và thay URL Manus.
+- [ ] Thêm cấu hình Vercel, README triển khai GitHub/Vercel và ZIP portable.
